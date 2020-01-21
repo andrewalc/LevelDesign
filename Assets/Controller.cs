@@ -11,10 +11,10 @@ public class Controller : MonoBehaviour
     public LayerMask whatIsGround;
     public Transform groundCheck;
     public float groundCheckRadius;
-
     public float moveSpeed = 10f;
     public float turnSpeed = 6f;
     public float jumpSpeed = 6f;
+    public float maxAirSpeed = 10f;
 
     // Start is called before the first frame update
     void Start()
@@ -42,10 +42,10 @@ public class Controller : MonoBehaviour
         {
             bool positiveX = rb.velocity.x > 0f;
             bool positiveZ = rb.velocity.z > 0f;
-            float capX = Math.Abs(rb.velocity.x) < 5f ? rb.velocity.x : positiveX ? 5f : -5f;
-            float capZ = Math.Abs(rb.velocity.z) < 5f ? rb.velocity.z : positiveZ ? 5f : -5f;
+            float capX = Math.Abs(rb.velocity.x) < maxAirSpeed ? rb.velocity.x : positiveX ? maxAirSpeed : -maxAirSpeed;
+            float capZ = Math.Abs(rb.velocity.z) < maxAirSpeed ? rb.velocity.z : positiveZ ? maxAirSpeed : -maxAirSpeed;
             
-            rb.velocity = new Vector3(capX, -8f, capZ);
+            rb.velocity = new Vector3(capX, -7f, capZ);
         }
     }
 
