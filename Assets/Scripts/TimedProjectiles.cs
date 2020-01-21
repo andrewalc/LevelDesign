@@ -13,17 +13,12 @@ public class TimedProjectiles : MonoBehaviour
         StartCoroutine(FiringSequence());
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     private IEnumerator FiringSequence()
     {
         yield return new WaitForSeconds(delay);
 
-        Instantiate(projectile);
+        var friend = Instantiate(projectile, transform);
+
         StartCoroutine(FiringSequence());
     }
 }
