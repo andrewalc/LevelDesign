@@ -7,8 +7,14 @@ public class Controller : MonoBehaviour
 {
     public Camera cam;
     private Rigidbody rb;
+    public bool grounded;
+    public LayerMask whatIsGround;
+    public Transform groundCheck;
+    public float groundCheckRadius;
+
     public float moveSpeed = 10f;
     public float turnSpeed = 6f;
+    public float jumpSpeed = 6f;
 
     // Start is called before the first frame update
     void Start()
@@ -16,10 +22,43 @@ public class Controller : MonoBehaviour
         rb = GetComponent<Rigidbody>();
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
+        //determines whether our bool, grounded, is true or false by seeing if our groundcheck overlaps something on the ground layer
+        grounded = Physics.OverlapSphere(groundCheck.position, groundCheckRadius, whatIsGround).Length > 0;
+
+    }
+
+    // Update is called once per frame
+    void FixedUpdate()
+    {
+        print(rb.velocity);
+
+
         PlayerMovement();
+        Jump();
+
+        if (!grounded)
+        {
+            bool positiveX = rb.velocity.x > 0f;
+            bool positiveZ = rb.velocity.z > 0f;
+            float capX = Math.Abs(rb.velocity.x) < 5f ? rb.velocity.x : positiveX ? 5f : -5f;
+            float capZ = Math.Abs(rb.velocity.z) < 5f ? rb.velocity.z : positiveZ ? 5f : -5f;
+            
+            rb.velocity = new Vector3(capX, -8f, capZ);
+        }
+    }
+
+    private void Jump()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            //and you are on the ground...
+            if(grounded)
+            {
+                rb.AddForce(new Vector3 (rb.velocity.x, jumpSpeed, rb.velocity.z));
+            }
+        }
     }
     
     private void PlayerMovement()
@@ -27,7 +66,6 @@ public class Controller : MonoBehaviour
         // Get input vals for forward and sideways movement
         float playerForwardMag = Input.GetAxis("Vertical") * Time.deltaTime;
         float playerSideMag = Input.GetAxis("Horizontal") * Time.deltaTime;
-        print(playerForwardMag);
         // Player model rotates to face cameras rotation through lerp
         Quaternion camRotation = cam.transform.rotation;
         camRotation.x = 0;
@@ -51,7 +89,12 @@ public class Controller : MonoBehaviour
         }
 
         // Multiple camera's direction by input magnitude to get new relative position
-        print(directionToMove * moveSpeed * moveSpeed);
         rb.velocity = directionToMove * moveSpeed * moveSpeed;
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
     }
 }
