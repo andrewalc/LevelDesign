@@ -27,10 +27,38 @@ public class Laser : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        RaycastMethod();
+        RaycastReflection();
         // Keep moving forward
         transform.position += speed * Time.deltaTime * transform.forward;
     }
+    
+    
+    private void RaycastReflection()
+    {
+        Ray ray = new Ray(transform.position, transform.forward);
+        RaycastHit hit;
+        if (Physics.Raycast(ray, out hit, 1f, reflectionSurface))
+        {
+            bouncesRemaining--;
+            if (!hit.transform.CompareTag("Mirror") || bouncesRemaining == 0) {
+                Destroy(gameObject);
+                return;
+            }
+            // Reflect at the mirrors reflection point for consistency
+            MirrorControl mirrorControl = hit.transform.GetComponent<MirrorControl>();
+            transform.position = mirrorControl.reflectionPoint.position;
+            // Reflection vector depends on the mode set in the inspector
+            Vector3 reflectionVector = normalVectorReflectionMode ? hit.normal : Vector3.Reflect(transform.forward, hit.normal);
+            // If the verticle angle is neutral, scale to the X-Z plane
+            if (mirrorControl.IsVerticleNeutral())
+            {
+                reflectionVector = Vector3.Scale(new Vector3(1, 0, 1), reflectionVector).normalized;
+            }
+            // Finally, set the rotation
+            transform.rotation = Quaternion.LookRotation(reflectionVector);
+        }
+    }
+    
     /**
      * In case our raycast fails, collision will reflect. A physical reflection is not guaranteed to match the editor
      * Gizmo preview.
@@ -42,40 +70,22 @@ public class Laser : MonoBehaviour
             Destroy(gameObject);
             return;
         }
-
+        // Reflect at the mirrors reflection point for consistency
         MirrorControl mirrorControl = other.transform.GetComponent<MirrorControl>();
-        transform.position = mirrorControl.reflectionPoint.position; // reposition for angle consistency
+        transform.position = mirrorControl.reflectionPoint.position;
+        // Reflection vector depends on the mode set in the inspector
         Vector3 reflectionVector = normalVectorReflectionMode
             ? other.contacts[other.contacts.Length - 1].normal
             : Vector3.Reflect(transform.forward, other.contacts[other.contacts.Length - 1].normal);
-        if (mirrorControl.isVerticleNeutral())
+        // If the verticle angle is neutral, scale to the X-Z plane
+        if (mirrorControl.IsVerticleNeutral())
         {
-            reflectionVector = Vector3.Scale(new Vector3(1, 0, 1), reflectionVector).normalized; // Scale to X-Z plane
+            reflectionVector = Vector3.Scale(new Vector3(1, 0, 1), reflectionVector).normalized;
         }
+        // Finally, set the rotation
         transform.rotation = Quaternion.LookRotation(reflectionVector);
     }
 
-    private void RaycastMethod()
-    {
-        Ray ray = new Ray(transform.position, transform.forward);
-        RaycastHit hit;
-        if (Physics.Raycast(ray, out hit, 1f, reflectionSurface))
-        {
-            bouncesRemaining--;
-            if (!hit.transform.CompareTag("Mirror") || bouncesRemaining == 0) {
-                Destroy(gameObject);
-                return;
-            }
-            MirrorControl mirrorControl = hit.transform.GetComponent<MirrorControl>();
-            transform.position = mirrorControl.reflectionPoint.position; // reposition for angle consistency
-            Vector3 reflectionVector = normalVectorReflectionMode ? hit.normal : Vector3.Reflect(transform.forward, hit.normal);
-            if (mirrorControl.isVerticleNeutral())
-            {
-                reflectionVector = Vector3.Scale(new Vector3(1, 0, 1), reflectionVector).normalized; // Scale to X-Z plane
-            }
-            transform.rotation = Quaternion.LookRotation(reflectionVector);
-        }
-    }
 
     /**
      * Recursive function for rendering a predictive editor view reflection line Gizmo. 
@@ -94,7 +104,7 @@ public class Laser : MonoBehaviour
         {
             MirrorControl mirrorControl = hit.transform.GetComponent<MirrorControl>();
             direction = normalVectorReflectionMode ? hit.normal : Vector3.Reflect(direction, hit.normal);
-            if (mirrorControl.isVerticleNeutral())
+            if (mirrorControl.IsVerticleNeutral())
             {
                 direction =  Vector3.Scale(new Vector3(1, 0, 1), direction).normalized; // Scale to X-Z plane
             }

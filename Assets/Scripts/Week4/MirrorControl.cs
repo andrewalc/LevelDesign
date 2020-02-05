@@ -9,55 +9,57 @@ public class MirrorControl : MonoBehaviour
     public Transform reflectionPoint;
     public int verticalAngleIncrements;
     public int horizontalAngleIncrements;
-    private int[] verticalAngles; // The angles that vertical cycling activation will apply
-    public int verticalAnglesIndex;
-    private Vector3 originalPosition;
-    private Quaternion originalRotation;
-    private bool inPlayerControl;
+    private int[] _verticalAngles; // The angles that vertical cycling activation will apply
+    private int _verticalAnglesIndex;
+    private Vector3 _originalPosition;
+    private Quaternion _originalRotation;
+    private bool _inPlayerControl;
     private void Start()
     {
-        inPlayerControl = false;
-        originalPosition = transform.position;
-        originalRotation = transform.rotation;
-        verticalAnglesIndex = 0; // 0 is neutral
-        verticalAngles = new[] {-verticalAngleIncrements, -verticalAngleIncrements, verticalAngleIncrements * 2}; // +x, +2x, back to 0
+        _inPlayerControl = false;
+        _originalPosition = transform.position;
+        _originalRotation = transform.rotation;
+        _verticalAnglesIndex = 0; // 0 is neutral
+        _verticalAngles = new[] {-verticalAngleIncrements, -verticalAngleIncrements, verticalAngleIncrements * 2}; // +x, +2x, back to 0
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (inPlayerControl)
+        if (_inPlayerControl)
         {
-            // Left click
+            // Left click, horizontal clockwise
             if (Input.GetMouseButtonDown(0))
             {
                 transform.Rotate(Vector3.up, horizontalAngleIncrements, Space.World);
             }
-            // Right click
+            // Right click, horizontal counter-clockwise
             if (Input.GetMouseButtonDown(1))
             {
                 transform.Rotate(Vector3.up, -horizontalAngleIncrements, Space.World);
             }
+            // E for verticle angles
             if (Input.GetKeyDown(KeyCode.E))
             {
-                transform.Rotate(Vector3.right, verticalAngles[verticalAnglesIndex], Space.Self);
-                verticalAnglesIndex = (verticalAnglesIndex + 1) % verticalAngles.Length;
+                transform.Rotate(Vector3.right, _verticalAngles[_verticalAnglesIndex], Space.Self);
+                _verticalAnglesIndex = (_verticalAnglesIndex + 1) % _verticalAngles.Length;
             }
+            // Q to reset to original state
             if (Input.GetKeyDown(KeyCode.Q))
             {
-                transform.position = originalPosition;
-                transform.rotation = originalRotation;
+                transform.position = _originalPosition;
+                transform.rotation = _originalRotation;
             }
         }
     }
 
     public void SetControl(bool isActive)
     {
-        inPlayerControl = isActive;
+        _inPlayerControl = isActive;
     }
 
-    public bool isVerticleNeutral()
+    public bool IsVerticleNeutral()
     {
-        return verticalAnglesIndex == 0;
+        return _verticalAnglesIndex == 0;
     }
 }
