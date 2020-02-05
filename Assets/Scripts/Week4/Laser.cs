@@ -8,13 +8,17 @@ using UnityEngine;
 public class Laser : MonoBehaviour
 {
     public float speed;
-    [Range(0f, 20f)]
+    [Range(0f, 35f)]
     public float lifetime;
     public int bouncesRemaining;
+    public LayerMask reflectionSurface;
+    // When enabled, laser will bounce in direction of collision/ray surface's 'normal vector
+    // without accounting for its original angle of collision.
+    public bool normalVectorReflectionMode; 
 
     private void Start()
     {
-        if (lifetime != 0f)
+        if (Math.Abs(lifetime) > 0f)
         {
             Destroy(gameObject, lifetime);
         }
@@ -23,48 +27,77 @@ public class Laser : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
+        RaycastMethod();
         // Keep moving forward
         transform.position += speed * Time.deltaTime * transform.forward;
     }
-
+    /**
+     * In case our raycast fails, collision will reflect. A physical reflection is not guaranteed to match the editor
+     * Gizmo preview.
+     */
     private void OnCollisionEnter(Collision other)
     {
         bouncesRemaining--;
-        if (bouncesRemaining == 0) {
+        if (!other.transform.CompareTag("Mirror") || bouncesRemaining == 0) {
             Destroy(gameObject);
             return;
-        } 
-        
-//        if (other.transform.CompareTag("Mirror"))
-//        {
-//            // If mirror, reflect to the mirror's current normal
-//            transform.rotation = Quaternion.LookRotation(other.contacts[0].normal);
-//
-//        }
-//        else
-//        {
-            // Reflect off of any other collision
-            Vector3 reflectionVector = Vector3.Reflect(transform.forward, other.contacts[0].normal);
-            reflectionVector = Vector3.Scale(new Vector3(1, 0, 1), reflectionVector).normalized; // Scale to X-Z plane
-            transform.rotation = Quaternion.LookRotation(reflectionVector);
-//        }
+        }
 
+        MirrorControl mirrorControl = other.transform.GetComponent<MirrorControl>();
+        transform.position = mirrorControl.reflectionPoint.position; // reposition for angle consistency
+        Vector3 reflectionVector = normalVectorReflectionMode
+            ? other.contacts[other.contacts.Length - 1].normal
+            : Vector3.Reflect(transform.forward, other.contacts[other.contacts.Length - 1].normal);
+        if (mirrorControl.isVerticleNeutral())
+        {
+            reflectionVector = Vector3.Scale(new Vector3(1, 0, 1), reflectionVector).normalized; // Scale to X-Z plane
+        }
+        transform.rotation = Quaternion.LookRotation(reflectionVector);
     }
 
+    private void RaycastMethod()
+    {
+        Ray ray = new Ray(transform.position, transform.forward);
+        RaycastHit hit;
+        if (Physics.Raycast(ray, out hit, 1f, reflectionSurface))
+        {
+            bouncesRemaining--;
+            if (!hit.transform.CompareTag("Mirror") || bouncesRemaining == 0) {
+                Destroy(gameObject);
+                return;
+            }
+            MirrorControl mirrorControl = hit.transform.GetComponent<MirrorControl>();
+            transform.position = mirrorControl.reflectionPoint.position; // reposition for angle consistency
+            Vector3 reflectionVector = normalVectorReflectionMode ? hit.normal : Vector3.Reflect(transform.forward, hit.normal);
+            if (mirrorControl.isVerticleNeutral())
+            {
+                reflectionVector = Vector3.Scale(new Vector3(1, 0, 1), reflectionVector).normalized; // Scale to X-Z plane
+            }
+            transform.rotation = Quaternion.LookRotation(reflectionVector);
+        }
+    }
+
+    /**
+     * Recursive function for rendering a predictive editor view reflection line Gizmo. 
+     * World of Zero: https://www.youtube.com/watch?v=GttdLYKEJAM
+     * == Modified to match laser parameters and scale to the X-Z plane. ==
+     */
     private void DrawPredictedReflectionPattern(Vector3 position, Vector3 direction, int reflectionsRemaining)
     {
         if (reflectionsRemaining == 0) {
             return;
         }
-
         Vector3 startingPosition = position;
-
         Ray ray = new Ray(position, direction);
         RaycastHit hit;
-        if (Physics.Raycast(ray, out hit, 1000))
+        if (Physics.Raycast(ray, out hit, 1000, reflectionSurface))
         {
-            direction = Vector3.Reflect(direction, hit.normal);
-            direction =  Vector3.Scale(new Vector3(1, 0, 1), direction).normalized; // Scale to X-Z plane
+            MirrorControl mirrorControl = hit.transform.GetComponent<MirrorControl>();
+            direction = normalVectorReflectionMode ? hit.normal : Vector3.Reflect(direction, hit.normal);
+            if (mirrorControl.isVerticleNeutral())
+            {
+                direction =  Vector3.Scale(new Vector3(1, 0, 1), direction).normalized; // Scale to X-Z plane
+            }
             position = hit.point;
         }
         else
@@ -74,20 +107,22 @@ public class Laser : MonoBehaviour
 
         Gizmos.color = Color.yellow;
         Gizmos.DrawLine(startingPosition, position);
+        if (hit.transform != null)
+        {
+            position = hit.transform.GetComponent<MirrorControl>().reflectionPoint.position; // reposition for angle consistency
+        }
 
         DrawPredictedReflectionPattern(position, direction, reflectionsRemaining - 1);
     }
 
     private void OnDrawGizmos()
-    {
-//        Gizmos.DrawLine(transform.position, transform.position + (transform.forward.normalized * reflectionRange));
+    { 
         Handles.color = Color.red;
         Handles.ArrowHandleCap(0, this.transform.position + this.transform.forward * 0.25f, this.transform.rotation, 0.5f, EventType.Repaint);
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(this.transform.position, transform.localScale.x);
-
-
-
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawRay(transform.position, transform.forward);
         DrawPredictedReflectionPattern(this.transform.position + this.transform.forward * 0.75f, this.transform.forward, bouncesRemaining);
     }
 }

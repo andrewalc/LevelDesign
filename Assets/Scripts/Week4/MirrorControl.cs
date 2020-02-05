@@ -6,10 +6,11 @@ using UnityStandardAssets.Characters.ThirdPerson;
 
 public class MirrorControl : MonoBehaviour
 {
+    public Transform reflectionPoint;
     public int verticalAngleIncrements;
     public int horizontalAngleIncrements;
     private int[] verticalAngles; // The angles that vertical cycling activation will apply
-    private int verticalAnglesIndex;
+    public int verticalAnglesIndex;
     private Vector3 originalPosition;
     private Quaternion originalRotation;
     private bool inPlayerControl;
@@ -18,9 +19,8 @@ public class MirrorControl : MonoBehaviour
         inPlayerControl = false;
         originalPosition = transform.position;
         originalRotation = transform.rotation;
-        verticalAnglesIndex = 0;
-        verticalAngles = new[] {-verticalAngleIncrements, -verticalAngleIncrements, verticalAngleIncrements * 3,
-            verticalAngleIncrements, -verticalAngleIncrements * 2}; // +x, +2x, -x , -2x, back to 0
+        verticalAnglesIndex = 0; // 0 is neutral
+        verticalAngles = new[] {-verticalAngleIncrements, -verticalAngleIncrements, verticalAngleIncrements * 2}; // +x, +2x, back to 0
     }
 
     // Update is called once per frame
@@ -28,12 +28,17 @@ public class MirrorControl : MonoBehaviour
     {
         if (inPlayerControl)
         {
-            if (Input.GetKeyDown(KeyCode.E))
+            // Left click
+            if (Input.GetMouseButtonDown(0))
             {
                 transform.Rotate(Vector3.up, horizontalAngleIncrements, Space.World);
             }
-
-            if (Input.GetKeyDown(KeyCode.R))
+            // Right click
+            if (Input.GetMouseButtonDown(1))
+            {
+                transform.Rotate(Vector3.up, -horizontalAngleIncrements, Space.World);
+            }
+            if (Input.GetKeyDown(KeyCode.E))
             {
                 transform.Rotate(Vector3.right, verticalAngles[verticalAnglesIndex], Space.Self);
                 verticalAnglesIndex = (verticalAnglesIndex + 1) % verticalAngles.Length;
@@ -49,5 +54,10 @@ public class MirrorControl : MonoBehaviour
     public void SetControl(bool isActive)
     {
         inPlayerControl = isActive;
+    }
+
+    public bool isVerticleNeutral()
+    {
+        return verticalAnglesIndex == 0;
     }
 }
