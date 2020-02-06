@@ -10,7 +10,7 @@ public class MirrorControl : MonoBehaviour
     public int verticalAngleIncrements;
     public int horizontalAngleIncrements;
     private int[] _verticalAngles; // The angles that vertical cycling activation will apply
-    private int _verticalAnglesIndex;
+    public int verticalAnglesIndex;
     private Vector3 _originalPosition;
     private Quaternion _originalRotation;
     private bool _inPlayerControl;
@@ -19,7 +19,7 @@ public class MirrorControl : MonoBehaviour
         _inPlayerControl = false;
         _originalPosition = transform.position;
         _originalRotation = transform.rotation;
-        _verticalAnglesIndex = 0; // 0 is neutral
+        verticalAnglesIndex = 0; // 0 is neutral
         _verticalAngles = new[] {-verticalAngleIncrements, -verticalAngleIncrements, verticalAngleIncrements * 2}; // +x, +2x, back to 0
     }
 
@@ -41,8 +41,8 @@ public class MirrorControl : MonoBehaviour
             // E for verticle angles
             if (Input.GetKeyDown(KeyCode.E))
             {
-                transform.Rotate(Vector3.right, _verticalAngles[_verticalAnglesIndex], Space.Self);
-                _verticalAnglesIndex = (_verticalAnglesIndex + 1) % _verticalAngles.Length;
+                transform.Rotate(Vector3.right, _verticalAngles[verticalAnglesIndex], Space.Self);
+                verticalAnglesIndex = (verticalAnglesIndex + 1) % _verticalAngles.Length;
             }
             // Q to reset to original state
             if (Input.GetKeyDown(KeyCode.Q))
@@ -60,6 +60,6 @@ public class MirrorControl : MonoBehaviour
 
     public bool IsVerticleNeutral()
     {
-        return _verticalAnglesIndex == 0;
+        return verticalAnglesIndex == 0;
     }
 }
