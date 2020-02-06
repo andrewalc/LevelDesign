@@ -19,7 +19,6 @@ public class MirrorControl : MonoBehaviour
         _inPlayerControl = false;
         _originalPosition = transform.position;
         _originalRotation = transform.rotation;
-        verticalAnglesIndex = 0; // 0 is neutral
         _verticalAngles = new[] {-verticalAngleIncrements, -verticalAngleIncrements, verticalAngleIncrements * 2}; // +x, +2x, back to 0
     }
 
