@@ -7,14 +7,13 @@ using UnityEngine.Timeline;
 public class TimelinePlayer : MonoBehaviour
 {
     public TimelineAsset asset;
-    private PlayableDirector director;
+    public PlayableDirector director;
 
     public bool playOnce;
     private bool hasPlayedOnce;
     // Start is called before the first frame update
     void Start()
     {
-        director = FindObjectOfType<PlayableDirector>();
         if (director == null)
         {
             Debug.LogError("No timeline director found!");
