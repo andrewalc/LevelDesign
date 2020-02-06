@@ -782,7 +782,6 @@ MonoBehaviour:
   reflectionPoint: {fileID: 1079499523}
   verticalAngleIncrements: 15
   horizontalAngleIncrements: 15
-  verticalAnglesIndex: 0
 --- !u!65 &4961506025285567950
 BoxCollider:
   m_ObjectHideFlags: 0
