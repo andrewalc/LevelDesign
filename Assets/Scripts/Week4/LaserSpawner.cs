@@ -11,9 +11,17 @@ public class LaserSpawner : MonoBehaviour
     [Range(0f, 5f)]
     public float spawnInterval;
 
+    public float startDelay;
+
     private void Start()
     {
         active = true;
+        StartCoroutine(StartDelay());
+    }
+
+    IEnumerator StartDelay()
+    {
+        yield return new WaitForSeconds(startDelay);
         StartCoroutine(SpawnLaser());
     }
 
