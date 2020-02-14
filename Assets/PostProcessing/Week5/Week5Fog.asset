@@ -22,27 +22,11 @@ MonoBehaviour:
     defaultState: 1
   intensity:
     overrideState: 1
-    value: 0.923
+    value: 0.34
   fastMode:
     overrideState: 1
     value: 0
---- !u!114 &11400000
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8e6292b2c06870d4495f009f912b9600, type: 3}
-  m_Name: Week5Fog
-  m_EditorClassIdentifier: 
-  settings:
-  - {fileID: 1807405278957461501}
-  - {fileID: -1501558706781359782}
-  - {fileID: 3729156500977446821}
---- !u!114 &1807405278957461501
+--- !u!114 &-145128957596698541
 MonoBehaviour:
   m_ObjectHideFlags: 3
   m_CorrespondingSourceObject: {fileID: 0}
@@ -60,36 +44,52 @@ MonoBehaviour:
     value: 1
   intensity:
     overrideState: 1
-    value: 17.2
+    value: 0.002
   threshold:
     overrideState: 1
-    value: 0.8
+    value: 0
   softKnee:
     overrideState: 1
-    value: 0.467
+    value: 0.39
   clamp:
     overrideState: 0
     value: 2
   diffusion:
     overrideState: 1
-    value: 8.94
+    value: 10
   anamorphicRatio:
     overrideState: 1
-    value: -0.179
+    value: 1
   color:
-    overrideState: 1
-    value: {r: 0.119615525, g: 0.36807483, b: 0.5283019, a: 1}
+    overrideState: 0
+    value: {r: 1, g: 1, b: 1, a: 1}
   fastMode:
-    overrideState: 1
+    overrideState: 0
     value: 0
   dirtTexture:
-    overrideState: 1
+    overrideState: 0
     value: {fileID: 0}
     defaultState: 1
   dirtIntensity:
-    overrideState: 1
+    overrideState: 0
     value: 0
---- !u!114 &3729156500977446821
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e6292b2c06870d4495f009f912b9600, type: 3}
+  m_Name: Week5Fog
+  m_EditorClassIdentifier: 
+  settings:
+  - {fileID: -1501558706781359782}
+  - {fileID: -145128957596698541}
+  - {fileID: 6802922004581047854}
+--- !u!114 &6802922004581047854
 MonoBehaviour:
   m_ObjectHideFlags: 3
   m_CorrespondingSourceObject: {fileID: 0}
@@ -101,7 +101,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: adb84e30e02715445aeb9959894e3b4d, type: 3}
   m_Name: ColorGrading
   m_EditorClassIdentifier: 
-  active: 0
+  active: 1
   enabled:
     overrideState: 1
     value: 1
@@ -114,7 +114,7 @@ MonoBehaviour:
     defaultState: 1
   tonemapper:
     overrideState: 1
-    value: 0
+    value: 1
   toneCurveToeStrength:
     overrideState: 0
     value: 0
@@ -142,19 +142,19 @@ MonoBehaviour:
     value: 1
   temperature:
     overrideState: 1
-    value: -39
+    value: 76
   tint:
     overrideState: 1
-    value: 7
+    value: 0
   colorFilter:
     overrideState: 1
-    value: {r: 1, g: 1, b: 1, a: 1}
+    value: {r: 1, g: 0.995283, b: 0.995283, a: 1}
   hueShift:
-    overrideState: 1
-    value: 0
+    overrideState: 0
+    value: -149
   saturation:
     overrideState: 1
-    value: -100
+    value: 0
   brightness:
     overrideState: 0
     value: 0
@@ -163,10 +163,10 @@ MonoBehaviour:
     value: 0
   contrast:
     overrideState: 1
-    value: 11
+    value: 0
   mixerRedOutRedIn:
     overrideState: 0
-    value: 0
+    value: 100
   mixerRedOutGreenIn:
     overrideState: 0
     value: 0
