@@ -8,48 +8,82 @@ using UnityEngine.UIElements;
 public class WaterDash : MonoBehaviour
 {
     public float chargeRate;
+    public float maxChargeDistance;
     public float travelTime;
     public GameObject targetPrefab;
     private GameObject _instantiatedPrefab;
     private float _chargeDistance;
+    private bool _inWater;
 
     private void Start()
     {
-        _chargeDistance = 2;
         _instantiatedPrefab = null;
+        _chargeDistance = 2;
     }
 
     private void Update()
     {
-        if (Input.GetMouseButton(0))
+        if (_inWater)
         {
-            _chargeDistance += Time.deltaTime * chargeRate;
-            if (_instantiatedPrefab == null)
+            // Charge distance while holding
+            if (Input.GetMouseButton(0))
             {
-                _instantiatedPrefab = Instantiate(targetPrefab, GetDashDestination(), Quaternion.identity);
+                _chargeDistance = Math.Min(maxChargeDistance,  _chargeDistance + Time.deltaTime * chargeRate);
+                UpdateTarget();
             }
-            else
+            // Dash on Release
+            if (Input.GetMouseButtonUp(0))
             {
-                _instantiatedPrefab.transform.position = GetDashDestination();
+                DestroyTarget();
+                Dash();
             }
         }
-        if (Input.GetMouseButtonUp(0))
-        {
-            Destroy(_instantiatedPrefab);
-            _instantiatedPrefab = null;
-            Dash();
-        }
-    }
-
-    private Vector3  GetDashDestination()
-    {
-        return transform.position + transform.forward.normalized * _chargeDistance;
     }
 
     private void Dash()
     {
         transform.DOMove(GetDashDestination(), travelTime);
         _chargeDistance = 2;
+    }
+
+    private Vector3  GetDashDestination()
+    {
+        return transform.position + transform.forward.normalized * _chargeDistance;
+    }
+    
+    private void UpdateTarget()
+    {
+        if (_instantiatedPrefab == null)
+        {
+            _instantiatedPrefab = Instantiate(targetPrefab, GetDashDestination(), Quaternion.identity);
+        }
+        else
+        {
+            _instantiatedPrefab.transform.position = GetDashDestination();
+        }
+    }
+
+    private void DestroyTarget()
+    {
+        Destroy(_instantiatedPrefab);
+        _instantiatedPrefab = null;
+    }
+    
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Water"))
+        {
+            _inWater = true;
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("Water"))
+        {
+            _inWater = false;
+            DestroyTarget();
+        }
     }
 
     private void OnDrawGizmos()

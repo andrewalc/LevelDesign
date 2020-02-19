@@ -9,6 +9,7 @@ TagManager:
   - Mirror
   - Laser
   - Crystal
+  - Water
   layers:
   - Default
   - TransparentFX
