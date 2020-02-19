@@ -82,6 +82,7 @@ public class WaterDash : MonoBehaviour
         if (other.CompareTag("Water"))
         {
             _inWater = false;
+            _chargeDistance = 2;
             DestroyTarget();
         }
     }
